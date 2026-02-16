@@ -888,11 +888,9 @@ class IRToBoogie(
             val rely = BProcedureCall("rely")
             val oldAssigns = translateOldAssigns(Set(memory))
             val guaranteeChecks = translateGuaranteeChecks(List(m))
-            List(rely) ++ oldAssigns ++ List(gammaValueCheck) ++ List(
-              store
-            ) ++ secureUpdate ++ guaranteeChecks ++ stateSplit
+            List(rely) ++ oldAssigns ++ List(gammaValueCheck, store) ++ secureUpdate ++ guaranteeChecks ++ stateSplit
           } else {
-            List(gammaValueCheck) ++ List(store) ++ secureUpdate ++ stateSplit
+            List(gammaValueCheck, store) ++ secureUpdate ++ stateSplit
           }
       }
     case l: LocalAssign =>
