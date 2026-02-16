@@ -882,23 +882,17 @@ class IRToBoogie(
           List(store) ++ stateSplit
         case memory: SharedMemory =>
 
-          val validCheck = if (config.memoryEncoding) {
-            List(transforms.memoryEncoding.assertValid(m))
-          } else {
-            List()
-          }
-
           val gammaValueCheck = BAssert(BinaryBExpr(BoolIMPLIES, L(LArgs, rhs.index), exprToGamma(m.value)))
           val secureUpdate = translateSecureUpdate(List(m))
           if (!atomic) {
             val rely = BProcedureCall("rely")
             val oldAssigns = translateOldAssigns(Set(memory))
             val guaranteeChecks = translateGuaranteeChecks(List(m))
-            List(rely) ++ oldAssigns ++ List(gammaValueCheck) ++ validCheck ++ List(
+            List(rely) ++ oldAssigns ++ List(gammaValueCheck) ++ List(
               store
             ) ++ secureUpdate ++ guaranteeChecks ++ stateSplit
           } else {
-            List(gammaValueCheck) ++ validCheck ++ List(store) ++ secureUpdate ++ stateSplit
+            List(gammaValueCheck) ++ List(store) ++ secureUpdate ++ stateSplit
           }
       }
     case l: LocalAssign =>

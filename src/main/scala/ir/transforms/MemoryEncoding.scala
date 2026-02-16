@@ -365,6 +365,22 @@ class MemoryEncodingTransform(ctx: IRContext, simplify: Boolean) extends CILVisi
     )
   }
 
+  override def vstmt(s: Statement) = {
+    s match {
+      case s: MemoryStore => {
+        val size = BitVecLiteral(s.size / 8, 64);
+        ChangeTo(List(Assert(valid(s.index, size), comment = Some("Requires Valid Memory")), s))
+      }
+      case s: MemoryLoad => {
+        val size = BitVecLiteral(s.size / 8, 64);
+        ChangeTo(List(Assert(valid(s.index, size), comment = Some("Requires Valid Memory")), s))
+      }
+      case _ => {
+        DoChildren()
+      }
+    }
+  }
+
   override def vprog(p: Program) = {
     // TODO: datatypes would clean liveness up a bit in future. Something like this:
     // https://github.com/boogie-org/boogie/blob/master/Test/datatypes/is-cons.bpl
@@ -383,12 +399,11 @@ class MemoryEncodingTransform(ctx: IRContext, simplify: Boolean) extends CILVisi
       case _ => {}
     }
 
-    SkipChildren()
+    DoChildren()
   }
 }
 
 def memoryEncodingDecls(): List[BDeclaration] = {
-  // This is very cursed i know
   val me_object_param = BMapVar("object", MapBType(BitVecBType(64), IntBType), Scope.Parameter)
   val me_offset_param = BMapVar("offset", MapBType(BitVecBType(64), BitVecBType(64)), Scope.Parameter)
   val me_region_param = BMapVar("region", MapBType(BitVecBType(64), IntBType), Scope.Parameter)
@@ -488,24 +503,6 @@ def memoryEncodingDecls(): List[BDeclaration] = {
           )
         )
       )
-    )
-  )
-}
-
-def assertValid(m: MemoryStore) = {
-  BAssert(
-    BFunctionCall(
-      "valid",
-      List(
-        me_liveness.toBoogie,
-        me_size.toBoogie,
-        me_object.toBoogie,
-        me_region.toBoogie,
-        me_offset.toBoogie,
-        m.index.toBoogie,
-        BitVecBLiteral(m.size / 8, 64)
-      ),
-      BoolBType
     )
   )
 }
