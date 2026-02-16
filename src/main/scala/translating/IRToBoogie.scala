@@ -881,7 +881,6 @@ class IRToBoogie(
         case _: StackMemory =>
           List(store) ++ stateSplit
         case memory: SharedMemory =>
-
           val gammaValueCheck = BAssert(BinaryBExpr(BoolIMPLIES, L(LArgs, rhs.index), exprToGamma(m.value)))
           val secureUpdate = translateSecureUpdate(List(m))
           if (!atomic) {
