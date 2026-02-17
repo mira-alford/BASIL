@@ -10,6 +10,7 @@ import util.{
   BoogieGeneratorConfig,
   BoogieMemoryAccessMode,
   DSAPhase,
+  MemoryEncodingRepresentation,
   DSConfig,
   DebugDumpIRLogger,
   ILLoadingConfig,
@@ -265,8 +266,11 @@ object Main {
     noif: Flag,
     @arg(name = "nodebug", doc = "Disable runtime debug assertions")
     noDebug: Flag,
-    @arg(name = "memory-encoding", doc = "Enable memory encoding")
-    memoryEncoding: Flag
+    @arg(
+      name = "memory-encoding",
+      doc = "Enable memory encoding. (options: flat|boo|obo). flat addressing maps pointers directly to offset. boo/obo split pointers into base and offset: boo = base -> offset -> object, obo = offset -> base -> object."
+    )
+    memoryEncoding: Option[String]
   )
 
   def main(args: Array[String]): Unit = {
@@ -382,6 +386,15 @@ object Main {
         throw new IllegalArgumentException("Illegal argument for --assert-callee-saved. allowed: (auto|always|never)")
     }
 
+    val memoryEncodingRepresentation = conf.memoryEncoding match
+      case Some("flat") => Some(MemoryEncodingRepresentation.Flat)
+      case Some("") => Some(MemoryEncodingRepresentation.Flat)
+      case Some("boo") => Some(MemoryEncodingRepresentation.BOO)
+      case Some("obo") => Some(MemoryEncodingRepresentation.OBO)
+      case None => None
+      case Some(_) =>
+        throw new IllegalArgumentException("Illegal option to memory-encoding, allowed are: (flat|obo|boo)")
+
     val boogieMemoryAccessMode = if (conf.lambdaStores.value) {
       BoogieMemoryAccessMode.LambdaStoreSelect
     } else {
@@ -394,7 +407,7 @@ object Main {
         rely,
         conf.threadSplit.value,
         conf.noif.value,
-        memoryEncoding = conf.memoryEncoding.value
+        memoryEncoding = memoryEncodingRepresentation
       )
 
     var loadingInputs = if (conf.bapInputDirName.isDefined) then {
@@ -498,7 +511,7 @@ object Main {
       dsaConfig = dsa,
       memoryTransform = conf.memoryTransform.value,
       assertCalleeSaved = calleeSaved,
-      memoryEncoding = conf.memoryEncoding.value
+      memoryEncoding = memoryEncodingRepresentation
     )
 
     Logger.info(programNameVersionHeader)

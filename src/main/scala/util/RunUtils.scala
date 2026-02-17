@@ -148,8 +148,14 @@ object RunUtils {
         memTransferTimer.checkPoint("Performed Memory Transform")
     }
 
-    if (conf.memoryEncoding) {
-      visit_prog(transforms.memoryEncoding.MemoryEncodingTransform(ctx, conf.simplify), ctx.program)
+    conf.memoryEncoding match {
+      case Some(MemoryEncodingRepresentation.Flat) => {
+        visit_prog(transforms.memoryEncoding.flat.FlatTransform(ctx, conf.simplify), ctx.program)
+      }
+      case Some(MemoryEncodingRepresentation.BOO) => {
+        visit_prog(transforms.memoryEncoding.split.SplitTransform(ctx, conf.simplify), ctx.program)
+      }
+      case _ => {}
     }
 
     if (conf.transformIrreducibleLoops) {

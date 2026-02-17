@@ -266,7 +266,8 @@ class IRToBoogie(
       .toList
       .sorted
 
-    val memEncodingDecls = if (config.memoryEncoding) then transforms.memoryEncoding.memoryEncodingDecls() else List()
+    val memEncodingDecls =
+      if (config.memoryEncoding.isDefined) then transforms.memoryEncoding.flat.memoryEncodingDecls() else List()
 
     val declarations =
       globalDecls ++ globalConsts ++ functionsUsed ++ memEncodingDecls ++ rgLib ++ pushUpModifiesFixedPoint(

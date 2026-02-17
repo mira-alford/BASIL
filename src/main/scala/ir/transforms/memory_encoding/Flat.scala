@@ -1,4 +1,4 @@
-package ir.transforms.memoryEncoding
+package ir.transforms.memoryEncoding.flat
 
 import boogie.*
 import ir.*
@@ -70,7 +70,7 @@ private def obj_liveness(obj: Expr, map: Expr = me_liveness) =
 
 private def read_mem(addr: Expr, map: Expr = mem) = FApplyExpr("read_mem", Seq(map, addr), BitVecType(8))
 
-class MemoryEncodingTransform(ctx: IRContext, simplify: Boolean) extends CILVisitor {
+class FlatTransform(ctx: IRContext, simplify: Boolean) extends CILVisitor {
   private var global_addresses = ctx.symbols.flatMap(s => Range(s.value.intValue, s.value.intValue + s.size)).toSet
 
   private def r(n: Int) = if simplify then LocalVar(s"R${n}_out", BitVecType(64))
