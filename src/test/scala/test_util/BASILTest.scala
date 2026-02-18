@@ -14,7 +14,8 @@ import util.{
   ILLoadingConfig,
   Logger,
   RunUtils,
-  StaticAnalysisConfig
+  StaticAnalysisConfig,
+  MemoryEncodingRepresentation
 }
 
 import java.io.{BufferedWriter, File, FileWriter}
@@ -33,7 +34,7 @@ case class TestConfig(
   summariseProcedures: Boolean = false,
   dsa: Option[DSConfig] = None,
   memoryTransform: Boolean = false,
-  memoryEncoding: Boolean = false,
+  memoryEncoding: Option[MemoryEncodingRepresentation] = None,
   useOfflineLifterForGtirbFrontend: Boolean = false
 ) {
   private val scaledtimespans = new ScaledTimeSpans {}
@@ -54,7 +55,7 @@ trait BASILTest {
     summariseProcedures: Boolean = false,
     dsa: Option[DSConfig] = None,
     memoryTransform: Boolean = false,
-    memoryEncoding: Boolean = false,
+    memoryEncoding: Option[MemoryEncodingRepresentation] = None,
     postLoad: IRContext => Unit = s => (),
     useOfflineLifterForGtirbFrontend: Boolean = false
   ): BASILResult = {

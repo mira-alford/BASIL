@@ -3,7 +3,16 @@ import test_util.BASILTest.*
 import test_util.{BASILTest, CaptureOutput, Histogram, TestConfig, TestCustomisation}
 import util.DSAPhase.TD
 import util.boogie_interaction.*
-import util.{DSConfig, DebugDumpIRLogger, LogLevel, Logger, MemoryRegionsMode, PerformanceTimer, StaticAnalysisConfig}
+import util.{
+  DSConfig,
+  DebugDumpIRLogger,
+  LogLevel,
+  Logger,
+  MemoryRegionsMode,
+  PerformanceTimer,
+  StaticAnalysisConfig,
+  MemoryEncodingRepresentation
+}
 
 import java.io.File
 import scala.collection.immutable.ListMap
@@ -706,11 +715,23 @@ class MemoryEncodingSystemTests extends SystemTests {
 
   runTests(
     "memory_encoding/correct",
-    TestConfig(useBAPFrontend = false, expectVerify = true, memoryEncoding = true, simplify = true, timeout = timeout)
+    TestConfig(
+      useBAPFrontend = false,
+      expectVerify = true,
+      memoryEncoding = Some(MemoryEncodingRepresentation.Flat),
+      simplify = true,
+      timeout = timeout
+    )
   )
 
   runTests(
     "memory_encoding/incorrect",
-    TestConfig(useBAPFrontend = false, expectVerify = false, memoryEncoding = true, simplify = true, timeout = timeout)
+    TestConfig(
+      useBAPFrontend = false,
+      expectVerify = false,
+      memoryEncoding = Some(MemoryEncodingRepresentation.Flat),
+      simplify = true,
+      timeout = timeout
+    )
   )
 }

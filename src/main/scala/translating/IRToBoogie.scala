@@ -3,7 +3,7 @@ import analysis.RegionInjector
 import boogie.*
 import ir.*
 import specification.*
-import util.{BoogieGeneratorConfig, BoogieMemoryAccessMode, ProcRelyVersion}
+import util.{BoogieGeneratorConfig, BoogieMemoryAccessMode, ProcRelyVersion, MemoryEncodingRepresentation}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -266,8 +266,11 @@ class IRToBoogie(
       .toList
       .sorted
 
-    val memEncodingDecls =
-      if (config.memoryEncoding.isDefined) then transforms.memoryEncoding.flat.memoryEncodingDecls() else List()
+    val memEncodingDecls = config.memoryEncoding match {
+      case Some(MemoryEncodingRepresentation.Flat) => transforms.memoryEncoding.flat.memoryEncodingDecls()
+      case Some(MemoryEncodingRepresentation.BOO) => transforms.memoryEncoding.split.memoryEncodingDecls()
+      case _ => List()
+    }
 
     val declarations =
       globalDecls ++ globalConsts ++ functionsUsed ++ memEncodingDecls ++ rgLib ++ pushUpModifiesFixedPoint(
