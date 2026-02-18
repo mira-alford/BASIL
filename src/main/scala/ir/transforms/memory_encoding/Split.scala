@@ -276,6 +276,10 @@ def memoryEncodingDecls(): List[BDeclaration] = {
   val bool_r_param = BVariable("r", BoolBType, Scope.Parameter)
 
   List(
+    BDataTypeDecl(
+      "mem_encoding",
+      List(BDataTypeConstructor("MemEncoding", List(addr_is_heap_param)))
+    ),
     BFunction(
       "me_addr_offset",
       List(addr_param),
