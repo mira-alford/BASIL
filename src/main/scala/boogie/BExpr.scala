@@ -820,3 +820,8 @@ case class ArrayAccess(global: SpecGlobal, index: Int) extends SpecGlobalOrAcces
   override def specGlobals: Set[SpecGlobalOrAccess] = Set(this)
   override def acceptVisit(visitor: BVisitor): BExpr = visitor.visitArrayAccess(this)
 }
+
+case class BFieldAccessExpr(record: BVar, field: BVar) extends BExpr {
+  override def toString(): String = s"$record->$field"
+  override def getType: BType = field.getType
+}
